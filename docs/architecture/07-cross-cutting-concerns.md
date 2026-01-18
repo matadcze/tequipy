@@ -73,7 +73,7 @@ async def domain_exception_handler(request, exc):
         NotFoundError: 404,
         RateLimitExceeded: 429,
     }.get(type(exc), 400)
-    
+
     return JSONResponse(
         status_code=status_code,
         content={
@@ -172,7 +172,7 @@ def log_json(logger, event: str, **kwargs):
     logger.info(json.dumps(log_data))
 
 # Usage
-log_json(logger, 
+log_json(logger,
     event="user_logged_in",
     user_id=str(user.id),
     email=user.email,
@@ -204,23 +204,23 @@ class RequestLoggingMiddleware:
     async def __call__(self, request, call_next):
         correlation_id = request.headers.get("X-Correlation-ID") or str(uuid4())
         set_correlation_id(correlation_id)
-        
+
         log_json(logger, event="request_started",
             method=request.method,
             path=request.url.path
         )
-        
+
         start = time.time()
         response = await call_next(request)
         duration = (time.time() - start) * 1000
-        
+
         log_json(logger, event="request_completed",
             method=request.method,
             path=request.url.path,
             status=response.status_code,
             duration_ms=duration
         )
-        
+
         response.headers["X-Correlation-ID"] = correlation_id
         return response
 ```
@@ -336,10 +336,10 @@ groups:
           severity: critical
         annotations:
           summary: "Backend instance is down"
-          
+
       - alert: BackendHighErrorRate
         expr: |
-          sum(rate(http_errors_total[5m])) 
+          sum(rate(http_errors_total[5m]))
           / sum(rate(http_requests_total[5m])) > 0.05
         for: 5m
         labels:
@@ -375,13 +375,13 @@ add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 class SecurityHeadersMiddleware:
     async def __call__(self, request, call_next):
         response = await call_next(request)
-        
+
         # CSP for JSON API
         response.headers["Content-Security-Policy"] = "default-src 'none'"
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "0"
-        
+
         return response
 ```
 
@@ -439,7 +439,7 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
     rate_limit_per_minute: int = 100
     cors_origins: list[str] = ["http://localhost:3000"]
-    
+
     class Config:
         env_file = ".env"
 
@@ -495,7 +495,7 @@ Response
 # api/app.py
 def create_app() -> FastAPI:
     app = FastAPI()
-    
+
     # Order matters - last added runs first
     app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(MetricsMiddleware)
@@ -508,7 +508,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
     return app
 ```
 
@@ -579,7 +579,7 @@ async def db_session():
 def client(db_session):
     def override_get_db():
         return db_session
-    
+
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as client:
         yield client
@@ -589,13 +589,13 @@ def client(db_session):
 async def test_register_user(db_session):
     repo = UserRepositoryImpl(db_session)
     service = AuthService(repo, ...)
-    
+
     user = await service.register(
         email="test@example.com",
         password="password123",
         full_name="Test User"
     )
-    
+
     assert user.email == "test@example.com"
 
 # Integration test
@@ -604,7 +604,7 @@ def test_login_endpoint(client):
         "email": "test@example.com",
         "password": "password123"
     })
-    
+
     assert response.status_code == 200
     assert "access_token" in response.json()
 ```
@@ -618,7 +618,7 @@ test("user can login", async ({ page }) => {
   await page.fill('[name="email"]', "test@example.com");
   await page.fill('[name="password"]', "password123");
   await page.click('button[type="submit"]');
-  
+
   await expect(page).toHaveURL("/dashboard");
   await expect(page.locator("h1")).toContainText("Welcome");
 });
@@ -649,21 +649,21 @@ async def readiness(
     redis: Redis = Depends(get_redis)
 ):
     checks = {}
-    
+
     # Check database
     try:
         await db.execute(text("SELECT 1"))
         checks["database"] = "ok"
     except Exception:
         checks["database"] = "error"
-    
+
     # Check Redis
     try:
         await redis.ping()
         checks["redis"] = "ok"
     except Exception:
         checks["redis"] = "error"
-    
+
     status = "ready" if all(v == "ok" for v in checks.values()) else "degraded"
     return {"status": status, "checks": checks}
 ```
