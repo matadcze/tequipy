@@ -26,6 +26,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.enable_hsts = enable_hsts if enable_hsts is not None else settings.enable_hsts
 
+    # Paths that serve HTML with external resources (docs UI)
+    DOCS_PATHS = ("/api/docs", "/api/redoc", "/docs", "/redoc")
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         response = await call_next(request)
 
@@ -42,9 +45,18 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Referrer-Policy: Control how much referrer information is included
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
-        # Content-Security-Policy: For API responses, restrict everything
-        # This is appropriate for JSON APIs that don't serve HTML/JS/CSS
-        response.headers["Content-Security-Policy"] = "default-src 'none'"
+        # Content-Security-Policy: Use permissive policy for docs UI,
+        # restrictive policy for API endpoints
+        if request.url.path.rstrip("/") in self.DOCS_PATHS:
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                "img-src 'self' https://fastapi.tiangolo.com data:; "
+                "font-src 'self' https://cdn.jsdelivr.net"
+            )
+        else:
+            response.headers["Content-Security-Policy"] = "default-src 'none'"
 
         # Strict-Transport-Security (HSTS): Force HTTPS for 1 year
         # Only enable when the app is behind HTTPS (production)
