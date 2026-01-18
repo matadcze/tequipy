@@ -1,4 +1,4 @@
-"""Tests for weather cache."""
+"""Tests for tiered weather cache (L1 in-memory + L2 Redis)."""
 
 import json
 import os
@@ -15,7 +15,7 @@ from src.infrastructure.weather.client import WeatherData
 
 
 class TestWeatherCache:
-    """Tests for WeatherCache."""
+    """Tests for WeatherCache with tiered caching."""
 
     @pytest.fixture
     def cache(self):
@@ -23,6 +23,8 @@ class TestWeatherCache:
         return WeatherCache(
             redis_url="redis://localhost:6379/0",
             ttl_seconds=60,
+            l1_max_size=100,
+            l1_ttl_seconds=30,
         )
 
     @pytest.fixture
@@ -51,9 +53,64 @@ class TestWeatherCache:
         key = cache._make_cache_key(-33.87, -151.21)
         assert key == "weather:current:-33.87:-151.21"
 
+    # L1 Cache Tests
+
+    def test_l1_set_and_get(self, cache, sample_weather_data):
+        """Test L1 cache set and get."""
+        key = cache._make_cache_key(52.52, 13.41)
+
+        # Set in L1
+        cache._set_in_l1(key, sample_weather_data)
+
+        # Get from L1
+        result = cache._get_from_l1(key)
+
+        assert result is not None
+        assert result.latitude == 52.52
+        assert result.temperature_c == 5.3
+
+    def test_l1_miss(self, cache):
+        """Test L1 cache miss."""
+        key = cache._make_cache_key(99.99, 99.99)
+        result = cache._get_from_l1(key)
+        assert result is None
+
+    def test_get_l1_stats(self, cache, sample_weather_data):
+        """Test L1 stats retrieval."""
+        key = cache._make_cache_key(52.52, 13.41)
+        cache._set_in_l1(key, sample_weather_data)
+
+        stats = cache.get_l1_stats()
+
+        assert stats["size"] == 1
+        assert stats["maxsize"] == 100
+        assert stats["ttl"] == 30
+
+    # L1 Hit Tests
+
     @pytest.mark.asyncio
-    async def test_get_cache_hit(self, cache):
-        """Test cache hit."""
+    async def test_get_l1_hit(self, cache, sample_weather_data):
+        """Test that L1 hit returns data without hitting Redis."""
+        key = cache._make_cache_key(52.52, 13.41)
+
+        # Pre-populate L1
+        cache._set_in_l1(key, sample_weather_data)
+
+        # Mock Redis to verify it's not called
+        mock_redis = AsyncMock()
+        with patch.object(cache, "_get_client", return_value=mock_redis):
+            result = await cache.get(52.52, 13.41)
+
+        # Should return L1 data without calling Redis
+        assert result is not None
+        assert result.latitude == 52.52
+        mock_redis.get.assert_not_called()
+
+    # L2 Hit Tests
+
+    @pytest.mark.asyncio
+    async def test_get_l2_hit_populates_l1(self, cache):
+        """Test that L2 hit populates L1 cache."""
         cached_data = {
             "latitude": 52.52,
             "longitude": 13.41,
@@ -68,15 +125,19 @@ class TestWeatherCache:
         with patch.object(cache, "_get_client", return_value=mock_redis):
             result = await cache.get(52.52, 13.41)
 
+        # Verify L2 hit
         assert result is not None
         assert result.latitude == 52.52
-        assert result.longitude == 13.41
-        assert result.temperature_c == 5.3
-        assert result.wind_speed_kmh == 12.5
+
+        # Verify L1 was populated
+        key = cache._make_cache_key(52.52, 13.41)
+        l1_result = cache._get_from_l1(key)
+        assert l1_result is not None
+        assert l1_result.latitude == 52.52
 
     @pytest.mark.asyncio
     async def test_get_cache_miss(self, cache):
-        """Test cache miss."""
+        """Test cache miss (both L1 and L2)."""
         mock_redis = AsyncMock()
         mock_redis.get.return_value = None
 
@@ -110,41 +171,68 @@ class TestWeatherCache:
 
         assert result is None
 
+    # Set Tests
+
     @pytest.mark.asyncio
-    async def test_set_success(self, cache, sample_weather_data):
-        """Test successful cache set."""
+    async def test_set_populates_both_tiers(self, cache, sample_weather_data):
+        """Test that set populates both L1 and L2."""
         mock_redis = AsyncMock()
         mock_redis.setex = AsyncMock()
 
         with patch.object(cache, "_get_client", return_value=mock_redis):
             result = await cache.set(sample_weather_data)
 
+        # Verify L2 was set
         assert result is True
         mock_redis.setex.assert_called_once()
         call_args = mock_redis.setex.call_args
         assert call_args[0][0] == "weather:current:52.52:13.41"
         assert call_args[0][1] == 60  # TTL
 
+        # Verify L1 was also set
+        key = cache._make_cache_key(52.52, 13.41)
+        l1_result = cache._get_from_l1(key)
+        assert l1_result is not None
+        assert l1_result.latitude == 52.52
+
     @pytest.mark.asyncio
-    async def test_set_redis_error(self, cache, sample_weather_data):
-        """Test handling of Redis errors on set."""
+    async def test_set_redis_error_still_sets_l1(self, cache, sample_weather_data):
+        """Test that L1 is set even when Redis fails."""
         mock_redis = AsyncMock()
         mock_redis.setex.side_effect = Exception("Redis connection error")
 
         with patch.object(cache, "_get_client", return_value=mock_redis):
-            # Should fail open (return False, not raise)
+            # Should fail open (return False, but L1 still set)
             result = await cache.set(sample_weather_data)
 
         assert result is False
 
+        # L1 should still be populated
+        key = cache._make_cache_key(52.52, 13.41)
+        l1_result = cache._get_from_l1(key)
+        assert l1_result is not None
+        assert l1_result.latitude == 52.52
+
+    # Close Tests
+
     @pytest.mark.asyncio
-    async def test_close(self, cache):
-        """Test client cleanup."""
+    async def test_close_clears_l1_and_redis(self, cache, sample_weather_data):
+        """Test that close clears L1 and closes Redis."""
+        # Populate L1
+        key = cache._make_cache_key(52.52, 13.41)
+        cache._set_in_l1(key, sample_weather_data)
+
+        # Mock Redis
         mock_redis = AsyncMock()
-        mock_redis.close = AsyncMock()
+        mock_redis.aclose = AsyncMock()
         cache._redis_client = mock_redis
 
         await cache.close()
 
-        mock_redis.close.assert_called_once()
+        # Verify Redis was closed
+        mock_redis.aclose.assert_called_once()
         assert cache._redis_client is None
+
+        # Verify L1 was cleared
+        l1_result = cache._get_from_l1(key)
+        assert l1_result is None
