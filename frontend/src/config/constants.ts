@@ -21,5 +21,5 @@ export const API_ENDPOINTS = {
 export const REQUEST_TIMEOUT_MS = 30000;
 export const POLLING_INTERVAL_MS = 2000;
 
-export const APP_NAME = "{{PROJECT_NAME}}";
+export const APP_NAME = "Tequipy";
 export const APP_VERSION = "0.1.0";

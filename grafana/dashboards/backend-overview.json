@@ -96,7 +96,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_requests_total{job=\"{{PROJECT_NAME_SLUG}}-backend\"}[5m])) by (status)",
+          "expr": "sum(rate(http_requests_total{job=\"tequipy-backend\"}[5m])) by (status)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -179,7 +179,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"{{PROJECT_NAME_SLUG}}-backend\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"tequipy-backend\"}[5m])) by (le))",
           "legendFormat": "p95",
           "range": true,
           "refId": "A"
@@ -190,7 +190,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job=\"{{PROJECT_NAME_SLUG}}-backend\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job=\"tequipy-backend\"}[5m])) by (le))",
           "legendFormat": "p50",
           "range": true,
           "refId": "B"
@@ -371,10 +371,7 @@
   "refresh": "30s",
   "schemaVersion": 39,
   "style": "dark",
-  "tags": [
-    "backend",
-    "fastapi"
-  ],
+  "tags": ["backend", "fastapi"],
   "templating": {
     "list": []
   },

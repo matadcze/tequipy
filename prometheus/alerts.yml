@@ -2,7 +2,7 @@ groups:
   - name: backend-alerts
     rules:
       - alert: BackendInstanceDown
-        expr: up{job="{{PROJECT_NAME_SLUG}}-backend"} == 0
+        expr: up{job="tequipy-backend"} == 0
         for: 1m
         labels:
           severity: critical
@@ -13,9 +13,9 @@ groups:
       - alert: BackendHighErrorRate
         expr: |
           (
-            sum(rate(http_requests_total{job="{{PROJECT_NAME_SLUG}}-backend", status=~"5.."}[5m]))
+            sum(rate(http_requests_total{job="tequipy-backend", status=~"5.."}[5m]))
           /
-            sum(rate(http_requests_total{job="{{PROJECT_NAME_SLUG}}-backend"}[5m]))
+            sum(rate(http_requests_total{job="tequipy-backend"}[5m]))
           ) > 0.05
         for: 5m
         labels:
@@ -28,7 +28,7 @@ groups:
         expr: |
           histogram_quantile(
             0.95,
-            sum(rate(http_request_duration_seconds_bucket{job="{{PROJECT_NAME_SLUG}}-backend"}[5m])) by (le)
+            sum(rate(http_request_duration_seconds_bucket{job="tequipy-backend"}[5m])) by (le)
           ) > 0.75
         for: 5m
         labels:

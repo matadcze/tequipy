@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     )
 
     # Application Information
-    app_name: str = "{{PROJECT_NAME}} API"
+    app_name: str = "Tequipy API"
     app_version: str = "0.1.0"
     debug: bool = False
 

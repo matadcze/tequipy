@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const APP_NAME = "{{PROJECT_NAME}}";
+const APP_NAME = "Tequipy";
 
 test("login page renders", async ({ page }) => {
   await page.goto("/login");

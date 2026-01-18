@@ -1,7 +1,7 @@
 .PHONY: help install backend-install frontend-install backend-dev frontend-dev dev backend-test frontend-test test backend-lint frontend-lint lint backend-format frontend-format format backend-typecheck pre-commit-install pre-commit seed clean docker-build docker-up docker-down docker-dev-prepare docker-dev-up
 
 help:
-	@echo "{{PROJECT_NAME}} - Development Commands"
+	@echo "Tequipy - Development Commands"
 	@echo ""
 	@echo "Setup:"
 	@echo "  make install              Install all dependencies"

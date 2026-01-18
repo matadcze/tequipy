@@ -4,32 +4,39 @@ Scaffolding for a production-ready FastAPI service: authentication and audit rou
 
 ## Getting Started
 
-1) Copy environment:
+1. Copy environment:
+
 ```
 cp .env.example .env
 ```
+
 Fill in `DATABASE_URL`, `JWT_SECRET_KEY`, and any other required values.
 
-2) Install dependencies:
+2. Install dependencies:
+
 ```
 uv sync
 ```
 
-3) Run migrations (uses `DATABASE_URL`):
+3. Run migrations (uses `DATABASE_URL`):
+
 ```
 uv run alembic upgrade head
 ```
 
-4) Start the API:
+4. Start the API:
+
 ```
 uv run uvicorn src.api.app:app --reload
 ```
 
 Optional:
+
 - Celery worker: `uv run celery -A src.worker.celery_app worker --loglevel=info`
 - Celery beat: `uv run celery -A src.worker.celery_app beat --loglevel=info`
 
 ## Developer Tooling
+
 - Linting/formatting: `make backend-lint` (ruff + black) and `make backend-format` (isort + black + ruff --fix) from the repo root.
 - Type checks: `make backend-typecheck` (mypy) for quick regressions in types.
 - Git hooks: `make pre-commit-install` to install hooks; run on demand with `make pre-commit`.
@@ -54,4 +61,4 @@ Optional:
 - `GET /api/v1/audit` – list audit events
 - `POST /api/v1/agents/run` – sample agent endpoint (stubbed provider)
 
-Use `{{PROJECT_NAME}}` placeholders throughout when creating a new project; see the root README for the templating checklist.
+Use `Tequipy` placeholders throughout when creating a new project; see the root README for the templating checklist.
