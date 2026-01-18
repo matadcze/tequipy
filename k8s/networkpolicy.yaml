@@ -46,14 +46,6 @@ spec:
       ports:
         - protocol: TCP
           port: 6379
-    # Allow PostgreSQL
-    - to:
-        - podSelector:
-            matchLabels:
-              app: postgres
-      ports:
-        - protocol: TCP
-          port: 5432
     # Allow Open-Meteo API (external)
     - to:
         - ipBlock:
