@@ -4,29 +4,31 @@
 
 ## Quick Navigation
 
-| Document                                                   | Description                                    | Audience              |
-| ---------------------------------------------------------- | ---------------------------------------------- | --------------------- |
-| [System Context](./01-system-context.md)                   | C4 Level 1 - High-level system overview        | All stakeholders      |
-| [Container Architecture](./02-container-architecture.md)   | C4 Level 2 - Docker services and communication | DevOps, Backend       |
-| [Component Architecture](./03-component-architecture.md)   | C4 Level 3 - Internal module structure         | Developers            |
-| [Data Architecture](./04-data-architecture.md)             | Database schema, data flows, Redis usage       | Backend, DBA          |
-| [Security Architecture](./05-security-architecture.md)     | Auth flows, security controls, compliance      | Security, Backend     |
-| [Deployment Architecture](./06-deployment-architecture.md) | Infrastructure, scaling, monitoring            | DevOps, SRE           |
-| [Cross-Cutting Concerns](./07-cross-cutting-concerns.md)   | Error handling, logging, observability         | All developers        |
-| [API Reference](./08-api-reference.md)                     | REST API endpoints and contracts               | Frontend, Integration |
+| Document                                                       | Description                                    | Audience              |
+| -------------------------------------------------------------- | ---------------------------------------------- | --------------------- |
+| [System Context](./01-system-context.md)                       | C4 Level 1 - High-level system overview        | All stakeholders      |
+| [Container Architecture](./02-container-architecture.md)       | C4 Level 2 - Docker services and communication | DevOps, Backend       |
+| [Component Architecture](./03-component-architecture.md)       | C4 Level 3 - Internal module structure         | Developers            |
+| [Data Architecture](./04-data-architecture.md)                 | Database schema, data flows, Redis usage       | Backend, DBA          |
+| [Security Architecture](./05-security-architecture.md)         | Auth flows, security controls, compliance      | Security, Backend     |
+| [Deployment Architecture](./06-deployment-architecture.md)     | Infrastructure, scaling, monitoring            | DevOps, SRE           |
+| [Cross-Cutting Concerns](./07-cross-cutting-concerns.md)       | Error handling, logging, observability         | All developers        |
+| [API Reference](./08-api-reference.md)                         | REST API endpoints and contracts               | Frontend, Integration |
+| [Interactive Visualization](./09-interactive-visualization.md) | Mermaid diagrams for exploring architecture    | All audiences         |
 
 ## Architecture Decision Records
 
 See [ADR Index](../adr/README.md) for all architectural decisions.
 
-| ADR                                                | Decision              | Impact                       |
-| -------------------------------------------------- | --------------------- | ---------------------------- |
-| [ADR-0001](../adr/0001-layered-architecture.md)    | Layered Architecture  | Backend structure            |
-| [ADR-0002](../adr/0002-jwt-authentication.md)      | JWT Authentication    | Security model               |
-| [ADR-0003](../adr/0003-repository-pattern.md)      | Repository Pattern    | Data access                  |
-| [ADR-0004](../adr/0004-http-client-and-caching.md) | HTTP Client & Caching | External integrations        |
-| [ADR-0005](../adr/0005-frontend-architecture.md)   | Frontend Architecture | Frontend structure           |
-| [ADR-0006](../adr/0006-api-client-design.md)       | API Client Design     | Frontend-Backend integration |
+| ADR                                                | Decision                 | Impact                       |
+| -------------------------------------------------- | ------------------------ | ---------------------------- |
+| [ADR-0001](../adr/0001-layered-architecture.md)    | Layered Architecture     | Backend structure            |
+| [ADR-0002](../adr/0002-jwt-authentication.md)      | JWT Authentication       | Security model               |
+| [ADR-0003](../adr/0003-repository-pattern.md)      | Repository Pattern       | Data access                  |
+| [ADR-0004](../adr/0004-http-client-and-caching.md) | HTTP Client & Caching    | External integrations        |
+| [ADR-0005](../adr/0005-frontend-architecture.md)   | Frontend Architecture    | Frontend structure           |
+| [ADR-0006](../adr/0006-api-client-design.md)       | API Client Design        | Frontend-Backend integration |
+| [ADR-0007](../adr/0007-weather-api-integration.md) | Weather API (Open-Meteo) | External weather data        |
 
 ## System Overview
 
@@ -64,6 +66,7 @@ graph TB
     end
 
     subgraph "External Services"
+        OM[Open-Meteo<br/>Weather API]
         LLM[LLM Provider<br/>Stubbed]
     end
 
@@ -74,6 +77,7 @@ graph TB
     F -->|API| B
     B --> P
     B --> R
+    B -->|weather| OM
     W --> P
     W --> R
     BT --> R

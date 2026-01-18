@@ -13,14 +13,16 @@ C4Context
     Person(user, "User", "Application user who registers, logs in, and uses the platform")
     Person(admin, "Administrator", "System administrator managing users and monitoring")
 
-    System(tequipy, "Tequipy Platform", "Full-stack web application with authentication, audit logging, and LLM agent capabilities")
+    System(tequipy, "Tequipy Platform", "Full-stack web application with authentication, audit logging, weather data, and LLM agent capabilities")
 
+    System_Ext(openmeteo, "Open-Meteo API", "Free weather API providing current temperature and wind speed")
     System_Ext(llm, "LLM Provider", "External AI/LLM service (OpenAI, Anthropic, etc.) - currently stubbed")
     System_Ext(email, "Email Service", "Future: Email notifications and password reset")
     System_Ext(monitoring, "External Monitoring", "Optional external APM/logging services")
 
     Rel(user, tequipy, "Uses", "HTTPS")
     Rel(admin, tequipy, "Manages & Monitors", "HTTPS")
+    Rel(tequipy, openmeteo, "Fetches weather", "HTTPS/REST")
     Rel(tequipy, llm, "Sends prompts", "HTTPS/API")
     Rel(tequipy, email, "Sends emails", "SMTP")
     Rel(tequipy, monitoring, "Exports metrics", "Prometheus/OTLP")
@@ -46,17 +48,20 @@ C4Context
               │  │  - User Authentication (JWT)            │   │
               │  │  - User Management                      │   │
               │  │  - Audit Logging                        │   │
+              │  │  - Weather Data (Open-Meteo)            │   │
               │  │  - LLM Agent Interface                  │   │
               │  │  - Dashboard & Profile Management       │   │
               │  └─────────────────────────────────────────┘   │
               │                                                 │
-              └──────────┬──────────────────────┬───────────────┘
-                         │                      │
-                         │                      │
-              ┌──────────▼──────────┐ ┌────────▼────────┐
-              │   LLM Provider      │ │  Email Service  │
-              │   (Stubbed)         │ │  (Future)       │
-              └─────────────────────┘ └─────────────────┘
+              └──────────┬─────────────────┬───────────────────┘
+                         │                 │
+           ┌─────────────┼─────────────────┼─────────────────┐
+           │             │                 │                 │
+           ▼             ▼                 ▼                 ▼
+┌─────────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│  Open-Meteo     │ │ LLM Provider│ │Email Service│ │  External   │
+│  Weather API    │ │  (Stubbed)  │ │  (Future)   │ │  Monitoring │
+└─────────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
 ```
 
 ## System Boundaries
@@ -73,11 +78,12 @@ C4Context
 
 ### Outside the System Boundary
 
-| External System | Purpose                                 | Integration Status              |
-| --------------- | --------------------------------------- | ------------------------------- |
-| LLM Provider    | AI/ML inference for agent functionality | Stubbed (ready for integration) |
-| Email Service   | Notifications, password reset           | Not implemented                 |
-| External APM    | Advanced application monitoring         | Optional                        |
+| External System | Purpose                                   | Integration Status              |
+| --------------- | ----------------------------------------- | ------------------------------- |
+| Open-Meteo API  | Real-time weather data (temp, wind speed) | **Integrated** (production)     |
+| LLM Provider    | AI/ML inference for agent functionality   | Stubbed (ready for integration) |
+| Email Service   | Notifications, password reset             | Not implemented                 |
+| External APM    | Advanced application monitoring           | Optional                        |
 
 ## User Personas
 

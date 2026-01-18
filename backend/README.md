@@ -60,5 +60,6 @@ Optional:
 - `GET/DELETE /api/v1/auth/me`
 - `GET /api/v1/audit` – list audit events
 - `POST /api/v1/agents/run` – sample agent endpoint (stubbed provider)
+- `GET /api/v1/weather/current?lat=&lon=` – current weather (Open-Meteo, cached 60s)
 
 Use `Tequipy` placeholders throughout when creating a new project; see the root README for the templating checklist.

@@ -24,6 +24,7 @@ C4Container
 
     System_Ext(prometheus, "Prometheus", "Metrics collection")
     System_Ext(grafana, "Grafana", "Metrics visualization")
+    System_Ext(openmeteo, "Open-Meteo API", "Weather data provider")
 
     Rel(user, nginx, "HTTPS", "443")
     Rel(nginx, frontend, "HTTP", "3000")
@@ -36,6 +37,7 @@ C4Container
     Rel(beat, redis, "Redis Protocol", "6379")
     Rel(prometheus, backend, "HTTP /metrics", "8000")
     Rel(grafana, prometheus, "PromQL", "9090")
+    Rel(backend, openmeteo, "HTTPS/REST", "443")
 ```
 
 ## Container Overview
@@ -199,16 +201,17 @@ C4Container
 
 ## Network Communication
 
-| From       | To         | Protocol | Port | Purpose                |
-| ---------- | ---------- | -------- | ---- | ---------------------- |
-| User       | Nginx      | HTTPS    | 443  | All traffic            |
-| Nginx      | Frontend   | HTTP     | 3000 | UI requests            |
-| Nginx      | Backend    | HTTP     | 8000 | API requests           |
-| Backend    | PostgreSQL | TCP      | 5432 | Data persistence       |
-| Backend    | Redis      | TCP      | 6379 | Caching, rate limiting |
-| Worker     | PostgreSQL | TCP      | 5432 | Task data access       |
-| Worker     | Redis      | TCP      | 6379 | Task queue             |
-| Prometheus | Backend    | HTTP     | 8000 | Metrics scraping       |
+| From       | To         | Protocol | Port | Purpose                              |
+| ---------- | ---------- | -------- | ---- | ------------------------------------ |
+| User       | Nginx      | HTTPS    | 443  | All traffic                          |
+| Nginx      | Frontend   | HTTP     | 3000 | UI requests                          |
+| Nginx      | Backend    | HTTP     | 8000 | API requests                         |
+| Backend    | PostgreSQL | TCP      | 5432 | Data persistence                     |
+| Backend    | Redis      | TCP      | 6379 | Caching, rate limiting               |
+| Backend    | Open-Meteo | HTTPS    | 443  | Weather data (1s timeout, 60s cache) |
+| Worker     | PostgreSQL | TCP      | 5432 | Task data access                     |
+| Worker     | Redis      | TCP      | 6379 | Task queue                           |
+| Prometheus | Backend    | HTTP     | 8000 | Metrics scraping                     |
 
 ## Health Checks
 

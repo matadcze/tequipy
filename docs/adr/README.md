@@ -16,6 +16,7 @@ An Architecture Decision Record (ADR) is a document that captures an important a
 | [0004](./0004-http-client-and-caching.md) | HTTP Client and Caching Strategy      | Accepted | 2025-01 |
 | [0005](./0005-frontend-architecture.md)   | Frontend Architecture with App Router | Accepted | 2025-01 |
 | [0006](./0006-api-client-design.md)       | Frontend API Client Design            | Accepted | 2025-01 |
+| [0007](./0007-weather-api-integration.md) | Weather API Integration (Open-Meteo)  | Accepted | 2026-01 |
 
 ## ADR Template
 
