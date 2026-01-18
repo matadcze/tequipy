@@ -14,7 +14,4 @@ wheels/
 backend/data/uploads
 backend/uploads/
 
-localhost.key
-localhost.crt
-
 .vscode
