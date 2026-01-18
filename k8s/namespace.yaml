@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tequipy
+  labels:
+    app.kubernetes.io/name: tequipy
+    app.kubernetes.io/component: namespace

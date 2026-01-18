@@ -59,6 +59,11 @@ class Settings(BaseSettings):
     llm_api_key: Optional[str] = None
     llm_api_base: Optional[str] = None
 
+    # Weather API settings (Open-Meteo)
+    weather_api_base: str = "https://api.open-meteo.com/v1"
+    weather_api_timeout_seconds: float = 1.0
+    weather_cache_ttl_seconds: int = 60
+
     def model_post_init(self, __context):
         """Post-initialization hook to set derived values."""
         # Default Celery URLs to Redis URL if not specified

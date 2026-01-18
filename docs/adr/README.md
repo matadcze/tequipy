@@ -8,12 +8,14 @@ An Architecture Decision Record (ADR) is a document that captures an important a
 
 ## ADR Index
 
-| ID                                     | Title                              | Status   | Date    |
-| -------------------------------------- | ---------------------------------- | -------- | ------- |
-| [0001](./0001-layered-architecture.md) | Layered Architecture Pattern       | Accepted | 2025-01 |
-| [0002](./0002-jwt-authentication.md)   | JWT-Based Authentication           | Accepted | 2025-01 |
-| [0003](./0003-repository-pattern.md)   | Repository Pattern for Data Access | Accepted | 2025-01 |
-| [0004](./0004-http-client-and-caching.md) | HTTP Client and Caching Strategy | Accepted | 2025-01 |
+| ID                                        | Title                                 | Status   | Date    |
+| ----------------------------------------- | ------------------------------------- | -------- | ------- |
+| [0001](./0001-layered-architecture.md)    | Layered Architecture Pattern          | Accepted | 2025-01 |
+| [0002](./0002-jwt-authentication.md)      | JWT-Based Authentication              | Accepted | 2025-01 |
+| [0003](./0003-repository-pattern.md)      | Repository Pattern for Data Access    | Accepted | 2025-01 |
+| [0004](./0004-http-client-and-caching.md) | HTTP Client and Caching Strategy      | Accepted | 2025-01 |
+| [0005](./0005-frontend-architecture.md)   | Frontend Architecture with App Router | Accepted | 2025-01 |
+| [0006](./0006-api-client-design.md)       | Frontend API Client Design            | Accepted | 2025-01 |
 
 ## ADR Template
 

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: tequipy
+  labels:
+    app.kubernetes.io/name: tequipy
+    app.kubernetes.io/component: backend
+data:
+  # Application settings
+  APP_NAME: "Tequipy API"
+  DEBUG: "false"
+
+  # Weather API settings
+  WEATHER_API_BASE: "https://api.open-meteo.com/v1"
+  WEATHER_API_TIMEOUT_SECONDS: "1.0"
+  WEATHER_CACHE_TTL_SECONDS: "60"
+
+  # Rate limiting
+  RATE_LIMIT_PER_MINUTE: "100"
+
+  # Security
+  ENABLE_HSTS: "true"

@@ -139,3 +139,22 @@ rate_limit_exceeded_total = _get_or_create_counter(
     "Total number of rate limit violations",
     ["endpoint"],
 )
+
+# Weather API metrics
+weather_requests_total = _get_or_create_counter(
+    "weather_requests_total",
+    "Total weather API requests",
+    ["status"],
+)
+
+weather_cache_operations_total = _get_or_create_counter(
+    "weather_cache_operations_total",
+    "Total weather cache operations",
+    ["operation", "result"],
+)
+
+weather_upstream_duration_seconds = _get_or_create_histogram(
+    "weather_upstream_duration_seconds",
+    "Duration of upstream weather API calls in seconds",
+    buckets=(0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0),
+)

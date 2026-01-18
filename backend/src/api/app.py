@@ -14,7 +14,7 @@ from src.api.middleware import (
     SecurityHeadersMiddleware,
 )
 from src.api.schemas import ErrorDetail, ErrorResponse
-from src.api.v1 import agents, audit, auth, health
+from src.api.v1 import agents, audit, auth, health, weather
 from src.core.config import settings
 from src.core.logging import configure_logging, get_correlation_id
 from src.domain.exceptions import (
@@ -23,12 +23,22 @@ from src.domain.exceptions import (
     DomainException,
     NotFoundError,
     RateLimitExceeded,
+    WeatherAPIError,
 )
+from src.infrastructure.weather import OpenMeteoClient, WeatherCache
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Initialize weather services
+    app.state.weather_client = OpenMeteoClient()
+    app.state.weather_cache = WeatherCache()
+
     yield
+
+    # Cleanup weather services
+    await app.state.weather_client.close()
+    await app.state.weather_cache.close()
 
 
 def create_app() -> FastAPI:
@@ -83,6 +93,8 @@ def create_app() -> FastAPI:
             status_code = status.HTTP_404_NOT_FOUND
         elif isinstance(exc, RateLimitExceeded):
             status_code = status.HTTP_429_TOO_MANY_REQUESTS
+        elif isinstance(exc, WeatherAPIError):
+            status_code = status.HTTP_502_BAD_GATEWAY
 
         error_detail = ErrorDetail(
             code=exc.__class__.__name__,
@@ -136,6 +148,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router, prefix="/api/v1")
     app.include_router(audit.router, prefix="/api/v1")
     app.include_router(agents.router, prefix="/api/v1")
+    app.include_router(weather.router, prefix="/api/v1")
 
     Instrumentator(
         should_group_status_codes=True,
