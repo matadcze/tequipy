@@ -26,9 +26,6 @@ jobs:
           - language: python
             build-mode: none
             path: backend
-          - language: javascript-typescript
-            build-mode: none
-            path: frontend
 
     steps:
       - name: Checkout repository
