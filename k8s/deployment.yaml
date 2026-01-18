@@ -31,7 +31,7 @@ spec:
       containers:
         - name: backend
           image: tequipy/backend:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8000
@@ -53,7 +53,7 @@ spec:
 
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false # UV needs write access to .venv
             capabilities:
               drop:
                 - ALL
@@ -81,11 +81,15 @@ spec:
               mountPath: /tmp
             - name: uploads
               mountPath: /app/uploads
+            - name: uv-cache
+              mountPath: /home/appuser/.cache/uv
 
       volumes:
         - name: tmp
           emptyDir: {}
         - name: uploads
+          emptyDir: {}
+        - name: uv-cache
           emptyDir: {}
 
       affinity:

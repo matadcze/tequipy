@@ -4,20 +4,22 @@ kind: Kustomization
 namespace: tequipy
 
 resources:
-  - namespace.yaml
-  - configmap.yaml
-  - secret.yaml
-  - deployment.yaml
-  - service.yaml
-  - hpa.yaml
-  - pdb.yaml
-  - networkpolicy.yaml
+- namespace.yaml
+- configmap.yaml
+- secret.yaml
+- deployment.yaml
+- service.yaml
+- hpa.yaml
+- pdb.yaml
+- networkpolicy.yaml
 
-commonLabels:
-  app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/version: "0.1.0"
 
 images:
-  - name: tequipy/backend
-    newName: tequipy/backend
-    newTag: latest
+- name: tequipy/backend
+  newName: tequipy/backend
+  newTag: latest
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 0.1.0
