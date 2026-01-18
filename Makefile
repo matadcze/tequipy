@@ -138,7 +138,7 @@ docker-dev-prepare:
 
 docker-dev-up:
 	@echo "Starting dev stack with hot reload (backend+frontend+nginx)..."
-	docker compose -f docker-compose.yml -f docker-compose.override.yml up backend frontend nginx
+	docker compose -f docker-compose.yml -f docker-compose.override.yml up backend frontend nginx grafana prometheus
 
 
 clean:
