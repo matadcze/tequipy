@@ -949,7 +949,7 @@ wheels = [
 ]
 
 [[package]]
-name = "project-name-slug"
+name = "tequipy"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
