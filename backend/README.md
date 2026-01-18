@@ -1,65 +1,94 @@
-# Backend (FastAPI) Template
+# Tequipy Backend
 
-Scaffolding for a production-ready FastAPI service: authentication and audit routes, async SQLAlchemy + Alembic migrations, Celery worker, Redis-powered rate limiting, structured logging, and Prometheus metrics.
+Minimal API-only backend with Weather API, Agents endpoint, Health/Metrics, Redis-powered rate limiting, structured logging, and Prometheus metrics.
 
 ## Getting Started
 
-1. Copy environment:
+1. Copy environment file:
 
-```
+```bash
 cp .env.example .env
 ```
 
-Fill in `DATABASE_URL`, `JWT_SECRET_KEY`, and any other required values.
-
 2. Install dependencies:
 
-```
+```bash
 uv sync
 ```
 
-3. Run migrations (uses `DATABASE_URL`):
+3. Start Redis (required for rate limiting and caching):
 
-```
-uv run alembic upgrade head
+```bash
+# Using Docker
+docker run -d -p 6379:6379 redis:7-alpine
+
+# Or use the full docker-compose stack from the repo root
 ```
 
 4. Start the API:
 
+```bash
+uv run uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
 ```
-uv run uvicorn src.api.app:app --reload
-```
-
-Optional:
-
-- Celery worker: `uv run celery -A src.worker.celery_app worker --loglevel=info`
-- Celery beat: `uv run celery -A src.worker.celery_app beat --loglevel=info`
 
 ## Developer Tooling
 
-- Linting/formatting: `make backend-lint` (ruff + black) and `make backend-format` (isort + black + ruff --fix) from the repo root.
-- Type checks: `make backend-typecheck` (mypy) for quick regressions in types.
-- Git hooks: `make pre-commit-install` to install hooks; run on demand with `make pre-commit`.
-- Seed data: `make seed` creates fixture users (admin@example.com / ChangeMe123! and demo@example.com / DemoPass123!) plus sample audit events. Safe to rerun.
+| Command                        | Description                              |
+| ------------------------------ | ---------------------------------------- |
+| `uv run pytest -v`             | Run all tests                            |
+| `uv run pytest -k "test_name"` | Run tests matching pattern               |
+| `make backend-lint`            | Lint check (ruff + black)                |
+| `make backend-format`          | Auto-format (isort + black + ruff --fix) |
+| `make backend-typecheck`       | Type check (mypy)                        |
+| `make pre-commit`              | Run all pre-commit hooks                 |
 
 ## Project Layout
 
-- `src/api`: FastAPI app factory, routers, middleware, schemas
-- `src/domain`: Entities, exceptions, repository interfaces, services
-- `src/infrastructure`: Database models/sessions, auth utilities, metrics provider
-- `src/worker`: Celery configuration and sample task
-- `alembic`: Migrations; `alembic.ini` + `alembic/env.py`
+```
+src/
+├── api/            # FastAPI app, routers, middleware, schemas
+│   ├── app.py      # App factory with lifespan, exception handlers
+│   ├── v1/         # Versioned API routers
+│   └── middleware/ # Rate limiting, logging, security headers
+├── domain/         # Business logic, exceptions, service interfaces
+│   └── services/   # WeatherService, AgentService
+├── infrastructure/ # External integrations
+│   ├── weather/    # Open-Meteo client and Redis cache
+│   ├── agents/     # LLM provider abstraction
+│   └── metrics/    # Prometheus metrics provider
+└── core/           # Configuration, logging utilities
+```
 
-## Endpoints
+## API Endpoints
 
-- `GET /api/v1/health` – basic liveness
-- `GET /api/v1/readiness` – checks DB/Redis/storage connectivity
-- `GET /metrics` – Prometheus exposition
-- `POST /api/v1/auth/register|login|refresh`
-- `PUT /api/v1/auth/change-password|profile`
-- `GET/DELETE /api/v1/auth/me`
-- `GET /api/v1/audit` – list audit events
-- `POST /api/v1/agents/run` – sample agent endpoint (stubbed provider)
-- `GET /api/v1/weather/current?lat=&lon=` – current weather (Open-Meteo, cached 60s)
+| Endpoint                            | Method | Description                          |
+| ----------------------------------- | ------ | ------------------------------------ |
+| `/api/v1/health`                    | GET    | Liveness check                       |
+| `/api/v1/readiness`                 | GET    | Readiness check (Redis connectivity) |
+| `/metrics`                          | GET    | Prometheus metrics                   |
+| `/api/v1/weather/current?lat=&lon=` | GET    | Current weather (cached 60s)         |
+| `/api/v1/agents/run`                | POST   | Agent execution (stub provider)      |
+| `/api/docs`                         | GET    | OpenAPI documentation                |
 
-Use `Tequipy` placeholders throughout when creating a new project; see the root README for the templating checklist.
+## Configuration
+
+Key environment variables (see `.env.example`):
+
+| Variable                | Default                    | Description             |
+| ----------------------- | -------------------------- | ----------------------- |
+| `REDIS_URL`             | `redis://localhost:6379/0` | Redis connection URL    |
+| `RATE_LIMIT_PER_MINUTE` | `100`                      | API rate limit per IP   |
+| `LLM_PROVIDER`          | `stub`                     | LLM provider for agents |
+| `DEBUG`                 | `false`                    | Enable debug mode       |
+
+## Docker
+
+From the repository root:
+
+```bash
+# Full stack (backend + redis + nginx + prometheus + grafana)
+docker compose up -d --build
+
+# Dev mode with hot reload
+make docker-dev-up
+```
