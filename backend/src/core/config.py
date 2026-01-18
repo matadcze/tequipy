@@ -39,12 +39,6 @@ class Settings(BaseSettings):
     # File uploads (used by readiness check)
     upload_dir: Path = Path("uploads")
 
-    # LLM / agent settings (override when wiring to a real provider)
-    llm_provider: str = "stub"
-    llm_model: str = "placeholder-model"
-    llm_api_key: Optional[str] = None
-    llm_api_base: Optional[str] = None
-
     # Weather API settings (Open-Meteo)
     weather_api_base: str = "https://api.open-meteo.com/v1"
     weather_api_timeout_seconds: float = 1.0

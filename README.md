@@ -1,6 +1,6 @@
 # Tequipy
 
-Minimal API-only backend with Weather API, Agents endpoint, Health/Metrics endpoints, Redis caching, and Prometheus/Grafana monitoring.
+Minimal API-only backend with Weather API, Health/Metrics endpoints, Redis caching, and Prometheus/Grafana monitoring.
 
 ## Prerequisites
 
@@ -63,7 +63,6 @@ Backend will be available at http://localhost:8000
 | `/api/v1/health`                    | GET    | Liveness check                    |
 | `/api/v1/readiness`                 | GET    | Readiness check (verifies Redis)  |
 | `/api/v1/weather/current?lat=&lon=` | GET    | Current weather data (cached 60s) |
-| `/api/v1/agents/run`                | POST   | Agent execution endpoint          |
 | `/api/docs`                         | GET    | OpenAPI/Swagger documentation     |
 | `/metrics`                          | GET    | Prometheus metrics                |
 

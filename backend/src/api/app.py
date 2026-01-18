@@ -14,7 +14,7 @@ from src.api.middleware import (
     SecurityHeadersMiddleware,
 )
 from src.api.schemas import ErrorDetail, ErrorResponse
-from src.api.v1 import agents, health, weather
+from src.api.v1 import health, weather
 from src.core.config import settings
 from src.core.logging import configure_logging, get_correlation_id
 from src.domain.exceptions import (
@@ -46,7 +46,7 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title=settings.app_name,
-        description="Minimal API-only backend with Weather API, Agents, Health/Metrics endpoints",
+        description="Minimal API-only backend with Weather API and Health/Metrics endpoints",
         version=settings.app_version,
         docs_url="/api/docs",
         openapi_url="/api/openapi.json",
@@ -145,7 +145,6 @@ def create_app() -> FastAPI:
         return response
 
     app.include_router(health.router, prefix="/api/v1")
-    app.include_router(agents.router, prefix="/api/v1")
     app.include_router(weather.router, prefix="/api/v1")
 
     Instrumentator(

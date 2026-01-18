@@ -2,14 +2,7 @@
 
 from fastapi import Request
 
-from src.domain.services import AgentService, WeatherService
-from src.infrastructure.agents.providers import get_llm_provider
-
-
-def get_agent_service() -> AgentService:
-    """Get agent service instance."""
-    provider = get_llm_provider()
-    return AgentService(provider=provider)
+from src.domain.services import WeatherService
 
 
 def get_weather_service(request: Request) -> WeatherService:

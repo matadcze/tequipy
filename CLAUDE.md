@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Minimal API-only backend with Weather API, Agents endpoint, Health/Metrics endpoints, Redis caching, and Prometheus/Grafana monitoring.
+Minimal API-only backend with Weather API, Health/Metrics endpoints, Redis caching, and Prometheus/Grafana monitoring.
 
 ## Commands
 
@@ -68,7 +68,6 @@ make docker-dev-up                # Dev mode with hot reload
 - `/api/v1/readiness` - Readiness check (Redis connectivity)
 - `/metrics` - Prometheus metrics
 - `/api/v1/weather/current?lat=&lon=` - Weather data (cached 60s)
-- `/api/v1/agents/run` - Agent execution (stub)
 - `/api/docs` - OpenAPI documentation
 
 ## Environment Setup

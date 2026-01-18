@@ -1,7 +1,7 @@
 """API request and response schemas."""
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field
 
@@ -34,23 +34,6 @@ class ReadinessResponse(BaseModel):
 
     status: str
     components: Dict[str, str]
-
-
-# Agent schemas
-class AgentRunRequest(BaseModel):
-    prompt: str = Field(..., min_length=1, description="User prompt for the agent")
-    system: Optional[str] = Field(None, description="Optional system guidance")
-    tools: Optional[List[str]] = Field(None, description="Requested tools (future use)")
-
-
-class AgentStep(BaseModel):
-    step_type: str
-    content: str
-
-
-class AgentRunResponse(BaseModel):
-    output: str
-    steps: List[AgentStep]
 
 
 # Weather schemas
