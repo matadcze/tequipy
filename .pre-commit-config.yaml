@@ -37,18 +37,3 @@ repos:
         pass_filenames: false
         additional_dependencies:
           - types-redis
-
-  - repo: local
-    hooks:
-      - id: frontend-lint
-        name: frontend lint
-        entry: npm run lint --prefix frontend
-        language: system
-        pass_filenames: false
-        files: ^frontend/
-      - id: frontend-format
-        name: frontend format
-        entry: npm run format --prefix frontend
-        language: system
-        pass_filenames: false
-        files: ^frontend/

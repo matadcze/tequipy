@@ -14,9 +14,3 @@ updates:
     versioning-strategy: lockfile-only
     allow:
       - dependency-type: "all"
-
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10

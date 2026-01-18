@@ -1,4 +1,3 @@
-from .entities import AuditEvent, RefreshToken, User
 from .exceptions import (
     AuthenticationError,
     AuthorizationError,
@@ -7,18 +6,12 @@ from .exceptions import (
     NotFoundError,
     RateLimitExceeded,
     ValidationError,
+    WeatherAPIError,
+    WeatherAPITimeoutError,
+    WeatherAPIUnavailableError,
 )
-from .repositories import AuditEventRepository, RefreshTokenRepository, UserRepository
-from .value_objects import EventType
 
 __all__ = [
-    "User",
-    "AuditEvent",
-    "RefreshToken",
-    "EventType",
-    "UserRepository",
-    "AuditEventRepository",
-    "RefreshTokenRepository",
     "DomainException",
     "ValidationError",
     "AuthenticationError",
@@ -26,4 +19,7 @@ __all__ = [
     "NotFoundError",
     "RateLimitExceeded",
     "InternalError",
+    "WeatherAPIError",
+    "WeatherAPITimeoutError",
+    "WeatherAPIUnavailableError",
 ]

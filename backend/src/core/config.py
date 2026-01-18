@@ -21,21 +21,8 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = False
 
-    # Database Configuration
-    database_url: str
-
     # Redis Configuration
     redis_url: str = "redis://localhost:6379/0"
-
-    # Celery Configuration (defaults to redis_url if not set)
-    celery_broker_url: Optional[str] = None
-    celery_result_backend: Optional[str] = None
-
-    # JWT Authentication
-    jwt_secret_key: str
-    jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 15
-    refresh_token_expire_days: int = 7
 
     # Rate Limiting
     rate_limit_per_minute: int = 100
@@ -46,7 +33,6 @@ class Settings(BaseSettings):
     # CORS Configuration
     cors_origins: List[str] = [
         "http://localhost",
-        "http://localhost:3000",
         "http://localhost:8000",
     ]
 
@@ -66,11 +52,6 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context):
         """Post-initialization hook to set derived values."""
-        # Default Celery URLs to Redis URL if not specified
-        if not self.celery_broker_url:
-            object.__setattr__(self, "celery_broker_url", self.redis_url)
-        if not self.celery_result_backend:
-            object.__setattr__(self, "celery_result_backend", self.redis_url)
         # Always allow localhost (port 80) for Nginx in local/dev setups
         if "http://localhost" not in self.cors_origins:
             object.__setattr__(self, "cors_origins", [*self.cors_origins, "http://localhost"])

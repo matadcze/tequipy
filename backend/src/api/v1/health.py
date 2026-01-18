@@ -1,10 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException, status
 
 from src.api.schemas import HealthResponse, ReadinessResponse
 from src.core.config import settings
-from src.infrastructure.database.session import get_db
 
 router = APIRouter(tags=["Health & Monitoring"])
 
@@ -15,17 +12,9 @@ async def health_check():
 
 
 @router.get("/readiness", response_model=ReadinessResponse)
-async def readiness_check(db: AsyncSession = Depends(get_db)):
+async def readiness_check():
     components = {}
     all_ready = True
-
-    try:
-        result = await db.execute(text("SELECT 1"))
-        result.scalar_one()
-        components["database"] = "healthy"
-    except Exception as e:
-        components["database"] = f"unhealthy: {str(e)}"
-        all_ready = False
 
     try:
         import redis.asyncio as aioredis

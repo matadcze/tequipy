@@ -10,7 +10,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from src.api.schemas import ErrorDetail, ErrorResponse
 from src.core.config import settings
 from src.core.logging import get_correlation_id, log_json, set_correlation_id
-from src.infrastructure.auth.jwt_provider import JWTProvider
 
 logger = logging.getLogger("app.rate_limit")
 
@@ -35,9 +34,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         client_ip = request.client.host if request.client else "unknown"
-        auth_header = request.headers.get("Authorization", "")
-        user_key = self._extract_user_key(auth_header)
-        rate_key = f"rate_limit:user:{user_key}" if user_key else f"rate_limit:ip:{client_ip}"
+        rate_key = f"rate_limit:ip:{client_ip}"
         correlation_id = (
             getattr(request.state, "correlation_id", None)
             or get_correlation_id()
@@ -95,18 +92,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         except Exception:
             return await call_next(request)
-
-    def _extract_user_key(self, auth_header: str) -> str | None:
-        if not auth_header.startswith("Bearer "):
-            return None
-        token = auth_header.split(" ", 1)[1].strip()
-        if not token:
-            return None
-        try:
-            payload = JWTProvider.verify_token(token)
-            return payload.get("sub")
-        except Exception:
-            return None
 
     async def _check_rate_limit(self, redis_client, key: str) -> tuple[bool, int, int]:
         now = time.time()
