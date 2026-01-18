@@ -8,15 +8,29 @@ An Architecture Decision Record (ADR) is a document that captures an important a
 
 ## ADR Index
 
-| ID                                        | Title                                 | Status   | Date    |
-| ----------------------------------------- | ------------------------------------- | -------- | ------- |
-| [0001](./0001-layered-architecture.md)    | Layered Architecture Pattern          | Accepted | 2025-01 |
-| [0002](./0002-jwt-authentication.md)      | JWT-Based Authentication              | Accepted | 2025-01 |
-| [0003](./0003-repository-pattern.md)      | Repository Pattern for Data Access    | Accepted | 2025-01 |
-| [0004](./0004-http-client-and-caching.md) | HTTP Client and Caching Strategy      | Accepted | 2025-01 |
-| [0005](./0005-frontend-architecture.md)   | Frontend Architecture with App Router | Accepted | 2025-01 |
-| [0006](./0006-api-client-design.md)       | Frontend API Client Design            | Accepted | 2025-01 |
-| [0007](./0007-weather-api-integration.md) | Weather API Integration (Open-Meteo)  | Accepted | 2026-01 |
+| ID                                        | Title                                | Status     | Date    |
+| ----------------------------------------- | ------------------------------------ | ---------- | ------- |
+| [0001](./0001-layered-architecture.md)    | Layered Architecture Pattern         | Accepted   | 2025-01 |
+| [0002](./0002-jwt-authentication.md)      | JWT-Based Authentication             | Deprecated | 2025-01 |
+| [0003](./0003-repository-pattern.md)      | Repository Pattern for Data Access   | Deprecated | 2025-01 |
+| [0004](./0004-http-client-and-caching.md) | HTTP Client and Caching Strategy     | Accepted   | 2025-01 |
+| ~~0005~~                                  | ~~Frontend Architecture~~            | Deleted    | -       |
+| ~~0006~~                                  | ~~Frontend API Client Design~~       | Deleted    | -       |
+| [0007](./0007-weather-api-integration.md) | Weather API Integration (Open-Meteo) | Accepted   | 2026-01 |
+
+### Deleted ADRs
+
+The following ADRs were removed as part of the January 2026 refactoring that simplified the project to an API-only backend:
+
+- **0005-frontend-architecture.md**: Removed with the Next.js frontend
+- **0006-api-client-design.md**: Removed with the Next.js frontend
+
+### Deprecated ADRs
+
+The following ADRs are deprecated but kept for historical reference:
+
+- **0002**: JWT authentication was removed (no auth layer in current architecture)
+- **0003**: Repository pattern was removed along with PostgreSQL database layer
 
 ## ADR Template
 
@@ -80,10 +94,11 @@ Description and why it was not chosen.
 ## ADR Lifecycle
 
 ```
-Proposed → Accepted → [Deprecated | Superseded]
+Proposed → Accepted → [Deprecated | Superseded | Deleted]
 ```
 
 - **Proposed**: Under discussion
 - **Accepted**: Decision has been made and implemented
 - **Deprecated**: No longer valid but kept for historical context
 - **Superseded**: Replaced by a newer ADR
+- **Deleted**: Removed when the related component was completely removed from the codebase

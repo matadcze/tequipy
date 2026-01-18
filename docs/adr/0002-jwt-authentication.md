@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted
+Deprecated (January 2026)
+
+> **Note**: This ADR is deprecated. The authentication layer was removed as part of the refactoring to a minimal API-only backend. Kept for historical reference.
 
 ## Context
 
